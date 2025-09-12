@@ -1,12 +1,12 @@
   const reviewSlider = document.querySelector('.');
   
-  if (reviewSlider) {
-    new Swiper(reviewSlider, {
+  if (.) {
+    new Swiper(., {
       loop: true,
       slidesPerView: 1,
       spaceBetween: 20,
       pagination: {
-        el: reviewSlider.querySelector('.swiper-pagination'),
+        el: ..querySelector('.swiper-pagination'),
         clickable: true,
       },
       autoplay: {
