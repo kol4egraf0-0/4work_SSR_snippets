@@ -1,0 +1,126 @@
+.toc-wrapper {
+  margin-top: 30px;
+}
+
+.toc-container {
+  background: #ffffff; /* свой цвет фона */
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.7); /* свой стиль тени */
+  transition: max-height 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.3s ease; /* своя анимка */
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.toc-container.collapsed {
+  max-height: 250px;
+}
+
+.toc-container.expanded {
+  max-height: none;
+}
+
+.toc-container.collapsed::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, #ffffff, transparent); /* на белом фоне самое то! */
+  pointer-events: none;
+  z-index: 1;
+}
+
+.toc-container.expanded::after {
+  display: none;
+}
+
+.toc-title {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #1C49ED; /* свой цвет подчёркивания заголовка */
+  font-weight: 600;
+}
+
+.toc-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.toc-list li {
+  margin-bottom: 12px;
+}
+
+.toc-list a {
+  font-size: 1.1rem;
+  display: block;
+  padding: 10px 0;
+  font-weight: 500;
+  color: #000000; /* свой цвет ссылок */
+  /* text-decoration: none !important; ну тут надо было прост*/
+}
+
+.toc-sublist {
+  list-style: none;
+  padding-left: 20px; 
+  margin: 8px 0 12px 0;
+}
+
+.toc-sublist li {
+  margin-bottom: 6px;
+}
+
+.toc-sublist a {
+  font-size: 1rem;
+  font-weight: 500; 
+  padding: 4px 0;
+  padding-left: 16px; 
+  /* от а цвет но если чо пиши прост колр*/
+}
+
+.toc-toggle-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #1C49ED; /* свой цвет текста кнопки */
+  margin-top: 20px;
+  margin-bottom: 32px;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: color 0.2s, transform 0.3s ease; /* своя анимка для кнопки */
+}
+
+.toc-toggle-btn:hover {
+  color: #222; /* свой цвет при наведении */
+}
+
+.toc-toggle-btn.expanded .toggle-icon {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+  .toc-container {
+    padding: 20px;
+  }
+
+  .toc-title {
+    font-size: 1.5rem;
+  }
+
+  .toc-list a {
+    font-size: 1.1rem;
+  }
+
+  .toc-toggle-btn {
+    font-size: 1.2rem;
+  }
+}
