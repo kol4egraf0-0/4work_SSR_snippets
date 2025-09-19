@@ -1,0 +1,58 @@
+### сис файлы
+/.htaccess
+/*.htaccess
+/.htaccess*
+/urlrewrite.php
+
+### логи 
+/*.log
+/*.sql
+/events_log.json
+/exchange_log.json
+/cancel_log.json
+/logs/*
+
+### архивы и резервные копии
+/*.tar.gz
+/*.gz
+/*.tar
+/*.bak
+/*.old
+/*~
+
+### IDE и редакторы
+/.idea
+.idea
+*/_*
+/_*
+
+### Composer
+/composer.*
+!/composer.json
+
+### битра 
+/bitrix/*
+!/bitrix/templates/
+!/bitrix/php_interface/
+/bitrix/php_interface/dbconn*
+
+### загрузки и сторонние зависимости
+/upload/*
+/vendor/*
+/node_modules/*
+
+### Служебные файлы сайта
+robots.txt
+/*.txt
+/robots.txt
+/sitemap*.xml
+
+### Прочие служебные файлы
+/*.dt
+/phpMyAdmin
+/ttt
+/bitrixsetup.update
+/sand_box.php
+
+# Этот файл — универсальный .gitignore для PHP/Bitrix-проектов.
+# Сохранён для быстрого копирования в новые проекты.
