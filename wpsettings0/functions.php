@@ -101,3 +101,124 @@ add_action('wp_enqueue_scripts', function() {
 	wp_enqueue_script('custom', get_template_directory_uri() . '/assets/js/custom.js');
 	// wp_enqueue_script('custom2', get_template_directory_uri() . '/assets/js/custom2.js');
 });
+
+function safe_replace_htmltags_acf() {
+  //безопасно чтоб ?run_fix=parol
+    if (!is_user_logged_in()  !current_user_can('administrator')) {
+        return;
+    }
+    if (!isset($_GET['run_fix'])  $_GET['run_fix'] !== 'parol') {
+        return;
+    }
+
+  //id записей и др
+    $post_ids = [2416...]; 
+
+  //acf поле или основной контент название
+    $field_name = ''; 
+    echo '<pre>';
+
+    foreach ($post_ids as $post_id) {
+
+
+        $content = get_field($field_name, $post_id);
+        if (!$content) {
+            echo "запись не найдена: $post_id";
+            continue;
+        }
+
+    //теги
+        $tag_cont = substr_count($content, '<strong>') + substr_count($content, '</strong>');
+        if ($tag_cont === 0) {
+            echo "$post_id: теги не найдены.\n";
+            continue;
+        }
+
+        $fixed = str_replace(['<strong>', '</strong>'], ['<b>', '</b>'], $content);
+        update_field($field_name, $fixed, $post_id);
+
+        echo "acf поле в записи обновлено $post_id: заменено $tag_cont столько то тегов\n";
+    }
+
+    echo '</pre>';
+    exit;
+}
+add_action('admin_init', 'safe_replace_htmltags_acf');
+
+function extend_search_to_all_fields($search, $query) {
+    global $wpdb;
+
+    if (!is_admin() && $query->is_main_query() && $query->is_search()) {
+        $search_term = $query->query_vars['s'];
+
+        if (empty($search_term)) {
+            return $search;
+        }
+
+        $excluded_field_types = [
+            'true_false', // Тип "true/false"
+            'checkbox',   // Тип "checkbox"
+            'select',     // Тип "select"
+            'radio',      // Тип "radio"
+            'image',      // Тип "image"
+            'file',       // Тип "file"
+            'gallery',    // Тип "gallery"
+            'relationship',// Тип "relationship"
+            'taxonomy',   // Тип "taxonomy"
+        ];
+
+        $field_groups = acf_get_field_groups();
+
+        $excluded_meta_keys = [];
+
+        if ($field_groups) {
+            foreach ($field_groups as $group) {
+                $fields = acf_get_fields($group['ID']);
+
+                if ($fields) {х
+                    $fields = get_acf_fields_recursive($fields);
+
+                    foreach ($fields as $field) {
+                        if (in_array($field['type'], $excluded_field_types)) {
+                            $excluded_meta_keys[] = $field['name'];
+                        }
+                    }
+                }
+            }
+        }
+
+        $search_sql = "
+            AND (
+                {$wpdb->posts}.post_title LIKE '%" . esc_sql($wpdb->esc_like($search_term)) . "%'
+                OR {$wpdb->posts}.post_content LIKE '%" . esc_sql($wpdb->esc_like($search_term)) . "%'
+                OR EXISTS (
+                    SELECT * FROM {$wpdb->postmeta}
+                    WHERE {$wpdb->postmeta}.post_id = {$wpdb->posts}.ID
+                    AND {$wpdb->postmeta}.meta_value LIKE '%" . esc_sql($wpdb->esc_like($search_term)) . "%'
+                    " . (!empty($excluded_meta_keys) ? "AND {$wpdb->postmeta}.meta_key NOT IN ('" . implode("','", array_map('esc_sql', $excluded_meta_keys)) . "')" : "") . "
+                    AND {$wpdb->postmeta}.meta_value NOT LIKE 'a:%'
+                )
+            )
+        ";
+
+        return $search_sql;
+    }
+
+    return $search;
+}
+add_filter('posts_search', 'extend_search_to_all_fields', 10, 2);
+
+// Рекурсивная функция для обхода всех полей, включая подполя
+function get_acf_fields_recursive($fields) {
+    $all_fields = [];
+    foreach ($fields as $field) {
+        if ($field['type'] === 'repeater' || $field['type'] === 'flexible_content') {
+            if (!empty($field['sub_fields'])) {
+                $all_fields = array_merge($all_fields, get_acf_fields_recursive($field['sub_fields']));
+            }
+        } else {
+            $all_fields[] = $field;
+        }
+    }
+    return $all_fields;
+}
