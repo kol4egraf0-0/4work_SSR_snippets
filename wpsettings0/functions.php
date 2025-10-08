@@ -222,3 +222,36 @@ function get_acf_fields_recursive($fields) {
     }
     return $all_fields;
 }
+
+//js + css фалики ес чо свои подставить
+function sp_scripts() {
+    $template_uri = get_template_directory_uri();
+    $theme_version = wp_get_theme()->get( 'Version' ); 
+
+    $styles = [
+        'bootstrap'       => '/assets/css/bootstrap.min.css',
+        'animate'         => '/assets/css/animate.min.css',
+        'magnific-popup'  => '/assets/css/magnific-popup.min.css',
+        'nice-select'     => '/assets/css/nice-select.min.css',
+        'slick'           => '/assets/css/slick.min.css',
+        'style'           => '/assets/css/style.css',
+        'fontawesome'     => '/assets/fonts/fontawesome/css/all.min.css',
+    ];
+
+    foreach ( $styles as $handle => $path ) {
+        wp_enqueue_style( $handle, $template_uri . $path, array(), $theme_version ); 
+    }
+
+    wp_enqueue_style( 'cms-style', get_stylesheet_uri(), array(), $theme_version ); 
+
+    wp_enqueue_script('main', $template_uri . '/assets/js/main.js', array(), $theme_version, true);
+
+    wp_enqueue_script('wow', $template_uri . '/assets/js/wow.min.js', array('jquery'), $theme_version, true);
+    wp_enqueue_script('slick', $template_uri . '/assets/js/slick.min.js', array('jquery'), $theme_version, true);
+    wp_enqueue_script('magnific-popup', $template_uri . '/assets/js/magnific-popup.min.js', array('jquery'), $theme_version, true);
+    wp_enqueue_script('jquery.nice-select', $template_uri . '/assets/js/jquery.nice-select.min.js', array('jquery'), $theme_version, true);
+    wp_enqueue_script('jquery.inview', $template_uri . '/assets/js/jquery.inview.min.js', array('jquery'), $theme_version, true);
+    wp_enqueue_script('isotope', $template_uri . '/assets/js/isotope.pkgd.min.js', array('jquery'), $theme_version, true);
+    wp_enqueue_script('imagesloaded', $template_uri . '/assets/js/imagesloaded.pkgd.min.js', array('jquery'), $theme_version, true);
+    wp_enqueue_script('bootstrap', $template_uri . '/assets/js/bootstrap.min.js', array('jquery'), $theme_version, true); 
+}
