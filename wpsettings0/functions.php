@@ -1,3 +1,4 @@
+<?php
 # Добавляет SVG в список разрешенных для загрузки файлов.
 add_filter( 'upload_mimes', 'svg_upload_allow' );
 function svg_upload_allow( $mimes ) {
@@ -223,7 +224,7 @@ function get_acf_fields_recursive($fields) {
     return $all_fields;
 }
 
-//js + css фалики ес чо свои подставить
+//js + css фалики ес чо свои подставить, наличие футера обязательно и page-main stat1c
 function sp_scripts() {
     $template_uri = get_template_directory_uri();
     $theme_version = wp_get_theme()->get( 'Version' ); 
@@ -255,3 +256,18 @@ function sp_scripts() {
     wp_enqueue_script('imagesloaded', $template_uri . '/assets/js/imagesloaded.pkgd.min.js', array('jquery'), $theme_version, true);
     wp_enqueue_script('bootstrap', $template_uri . '/assets/js/bootstrap.min.js', array('jquery'), $theme_version, true); 
 }
+
+//опции дефолтные для всех страниц нужные чот
+function my_acf_op_init() {
+	if( function_exists('acf_add_options_sub_page') ) {
+		$option_page = acf_add_options_page(array(
+            'page_title'    => __('Опции'),
+            'menu_title'    => __('Опции'),
+            'menu_slug'     => 'options',
+            'capability'    => 'edit_posts',
+            'redirect'      => false
+        ));
+    }
+}
+
+?>
