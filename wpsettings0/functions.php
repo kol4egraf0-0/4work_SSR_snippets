@@ -270,8 +270,66 @@ function my_acf_op_init() {
     }
 }
 
-/*
-MAXMA TEST
-*/
+/**
+ * MAXMA ползунок в корзине для выбора количества баллов в корзине.
+ */
+function maxma_add_bonuses_range() {
+    if (!is_user_logged_in()) {
+        return;
+    }
+    $bonuses = getClientBonuses();
+    if ($exceptions = isExceptionsInCart()) {
+        update_user_meta(get_current_user_id(), 'maxma_bonuses', 0);
+        echo "<div class='maxma-bonuses'>";
+        echo "<div>Всего бонусных баллов: {$bonuses}</div>";
+        echo "<div>При применении скидки бонусы не списываются.</div>";
+        echo "</div>";
+        return;
+    }
+
+//  delete_user_meta(get_current_user_id(), 'maxma_bonuses');
+    $bonusesCheck = calculatePurchaseMaxma();
+    $maxToApply = !empty($bonusesCheck) ? $bonusesCheck['max_to_apply'] : 0;
+    $bonusesToApply = $_POST['maxma_bonus'] ?? (get_user_meta(get_current_user_id(), 'maxma_bonuses', true) ?? ($maxToApply ?? 0));
+
+    if (!empty($maxToApply)) {
+        if (empty($bonusesToApply)) {
+            $bonusesToApply = 0;
+        }
+        update_user_meta(get_current_user_id(), 'maxma_bonuses', wc_clean($bonusesToApply));
+        echo "<div class='maxma-bonuses'>";
+            echo "<div class='mb-text'>Оплатить бонусными баллами:</div>";
+//            echo "<input class='maxma-range' name='maxma_bonus' type='number' value='{$bonusesToApply}' min='0' max='{$maxToApply}' oninput='this.nextElementSibling.value = this.value'>";
+            echo "<input class='maxma-range' name='maxma_bonus' type='number' value='{$bonusesToApply}' min='0' max='{$maxToApply}'>";
+//            echo "<input class='maxma-range' type='range' min='0' max='{$maxToApply}' value='{$bonusesToApply}' oninput='this.previousElementSibling.value = this.value'>";
+              echo "<div>Доступно бонусных баллов к списанию: {$maxToApply}</div>";
+              echo "<div>Всего бонусных баллов: {$bonuses}</div>";
+//            echo "<div class='mb-outputs'>";
+//                echo "<output class='mb-min'>0</output>";
+//                echo "<output class='mb-max'>{$maxToApply}</output>";
+//            echo "</div>";
+        echo "</div>";
+//      echo "<label class='cart-maxma-switch'>";
+//            echo "<input type='checkbox'>";
+//            echo "<span class='cms-slider'></span>";
+//        echo "</label>";
+    }
+    else {
+        if ($bonuses > 0) {
+            echo "<div class='maxma-bonuses'>";
+            echo "<div>Всего бонусных баллов: {$bonuses}</div>";
+            echo "<div>При применении скидки бонусы не списываются.</div>";
+            echo "</div>";
+        }
+        else {
+            echo "<div class='maxma-bonuses'>";
+            echo "<div>Всего бонусных баллов: 0</div>";
+            echo "</div>";
+        }
+    }
+}
+add_action('woocommerce_after_cart_table', 'maxma_add_bonuses_range');
+
+
 
 ?>
