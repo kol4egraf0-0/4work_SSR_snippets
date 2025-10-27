@@ -330,6 +330,30 @@ function maxma_add_bonuses_range() {
 }
 add_action('woocommerce_after_cart_table', 'maxma_add_bonuses_range');
 
-
+/**
+ * MAXMA. Зарегистрироваться в MAXMA из личного кабинета.
+ *
+ * @throws JsonException
+ */
+function maxmanewuser_ajax() {
+    if (!is_user_logged_in()) {
+        echo json_encode(['status' => 'error', 'info' => 'Вы не авторизованы.'],JSON_THROW_ON_ERROR);
+    }
+    else {
+        $userPhone = preg_replace('/\D/', '', get_user_meta(get_current_user_id(), 'account_phone', true));
+        if (empty($userPhone)) {
+            $userPhone = preg_replace('/\D/', '', get_user_meta(get_current_user_id(),'billing_phone', true));
+        }
+        if (empty($userPhone)) {
+            echo json_encode(['status' => 'error', 'info' => 'Номер телефона отсутствует.'],JSON_THROW_ON_ERROR);
+        }
+        else {
+            echo json_encode(maxmaCreateClient($userPhone, get_current_user_id()),JSON_THROW_ON_ERROR);
+        }
+    }
+    wp_die();
+}
+add_action( 'wp_ajax_maxmanewuser', 'maxmanewuser_ajax' );
+add_action( 'wp_ajax_nopriv_maxmanewuser', 'maxmanewuser_ajax' );
 
 ?>
