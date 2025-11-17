@@ -356,4 +356,94 @@ function maxmanewuser_ajax() {
 add_action( 'wp_ajax_maxmanewuser', 'maxmanewuser_ajax' );
 add_action( 'wp_ajax_nopriv_maxmanewuser', 'maxmanewuser_ajax' );
 
+/**
+ * отправка сообщений в телеграмм после заполнения формы.
+ */
+function book_ajax() {
+    define('TELEGRAM_CHATID', 'token1');
+
+    // сюда нужно вписать токен вашего бота
+    define('TELEGRAM_TOKEN', 'token2');
+
+    $text = '';
+//    foreach($_POST as $key => $value) {
+//        $text .= "<b>".$key."</b>: ".$value."\n";
+//    }
+
+    if ($_POST['dynamic_theme']) {
+        $text .= "<b>Тема</b>: ".$_POST['dynamic_theme']."\n";
+    }
+    if ($_POST['dynamic_cur_title']) {
+        $text .= "<b>Мастер-класс</b>: ".$_POST['dynamic_cur_title']."\n";
+    }
+    if ($_POST['dynamic_cur_url']) {
+        $text .= "<b>Ссылка</b>: ".$_POST['dynamic_cur_url']."\n";
+    }
+    if ($_POST['user-name']) {
+        $text .= "<b>Имя</b>: ".$_POST['user-name']."\n";
+    }
+    if ($_POST['user-phone']) {
+        $text .= "<b>Номер телефона</b>: ".$_POST['user-phone']."\n";
+    }
+    if ($_POST['user-date']) {
+        $text .= "<b>Дата</b>: ".$_POST['user-date']."\n";
+    }
+    if ($_POST['user-email']) {
+        $text .= "<b>Почта</b>: ".$_POST['user-email']."\n";
+    }
+    if ($_POST['user-time']) {
+        $text .= "<b>Время</b>: ".$_POST['user-time']."\n";
+    }
+    if ($_POST['user-amount']) {
+        $text .= "<b>Количество человек</b>: ".$_POST['user-amount']."\n";
+    }
+    if ($_POST['user-comment']) {
+        $text .= "<b>Комментарий</b>: ".$_POST['user-comment']."\n";
+    }
+//  if ($_POST['action']) {
+//      $text .= "<b>Тип формы</b>: ".$_POST['action']."\n";
+//  }
+
+    $ch = curl_init();
+    curl_setopt_array(
+        $ch,
+        array(
+            CURLOPT_URL => 'https://api.telegram.org/bot' . TELEGRAM_TOKEN . '/sendMessage',
+            CURLOPT_POST => TRUE,
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_POSTFIELDS => array(
+                'parse_mode' => "html",
+                'chat_id' => TELEGRAM_CHATID, // название канала - в формате @my-channel-name
+                'text' => $text,
+            ),
+        )
+    );
+    $result = curl_exec($ch);
+
+    $handle = fopen(get_stylesheet_directory() . '/log/data.txt', 'wb');
+    if ($result) {
+        fwrite($handle, '['.$_POST['user-name'].' | '.$_POST['user-phone'].']'.print_r($result, true).PHP_EOL);
+    }
+    else {
+        fwrite($handle, '['.$_POST['user-name'].' | '.$_POST['user-phone'].']'.curl_error($ch).PHP_EOL);
+    }
+    fclose($handle);
+
+
+//  $handle = fopen('log/data.txt', 'wb');
+//    if ($result) {
+//      fwrite($handle, print_r($result, true));
+//    }
+//    else {
+//      fwrite($handle, curl_error($ch));
+//    }
+//  fclose($handle);
+
+//    echo json_encode($_POST);
+
+    die; // даём понять, что обработчик закончил выполнение
+}
 ?>
+
+
