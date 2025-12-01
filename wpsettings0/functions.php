@@ -444,6 +444,48 @@ function book_ajax() {
 
     die; // даём понять, что обработчик закончил выполнение
 }
+
+/**
+ * MAXMA setup
+ */
+use Maxma\Maxma;
+$chtwUser = wp_get_current_user();
+$Maxma = !empty($chtwUser->account_phone) ? new Maxma('+'.$chtwUser->account_phone) : new Maxma();
+
+function maxma_get_role() {
+    global $Maxma;
+    if (!$Maxma->isSet) {
+        return false;
+    }
+    $client = $Maxma->getClient(true);
+    if (!empty($client['level']) && !empty($client['level']['level'])) {
+/**
+ * MAXMA setup lvls
+ */
+        return false;
+    }
+    return false;
+}
+
+function isClientSpecial() {
+    $maxmaLevel = maxma_get_role();
+    if ($maxmaLevel && $maxmaLevel['level'] > 2) {
+        return $maxmaLevel;
+    }
+    return false;
+}
+
+function maxma_discount_level() {
+    $current_user = wp_get_current_user();
+    if ($current_user === null) {
+        return;
+    }
+    $role = maxma_get_role();
+    if (!empty($role)) {
+        $current_user->set_role(current_user_can('manage_options') ? 'administrator' : $role['id']);
+    }
+}
+add_action( 'after_setup_theme', 'maxma_discount_level' );
 ?>
 
 
